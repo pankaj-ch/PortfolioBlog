@@ -1,36 +1,35 @@
 {
-  "name": "gatsby-starter-wordpress-homepage",
+  "name": "gatsby-wordpress-homepage",
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "gatsby-plugin-manifest": "^5.0.0",
-    "gatsby-source-wordpress": "^7.0.0",
-    "@fontsource/dm-mono": "^4.5.9",
-    "@fontsource/dm-sans": "^4.5.8",
+    "gatsby-plugin-manifest": "^5.2.0",
+    "gatsby-source-wordpress": "^7.2.0",
+    "@fontsource/dm-mono": "^4.5.10",
+    "@fontsource/dm-sans": "^4.5.9",
     "@vanilla-extract/babel-plugin": "^1.2.0",
-    "@vanilla-extract/css": "^1.9.0",
-    "@vanilla-extract/css-utils": "^0.1.2",
-    "@vanilla-extract/webpack-plugin": "^2.1.12",
-    "gatsby": "^5.0.0",
-    "gatsby-plugin-image": "^3.0.0",
-    "gatsby-plugin-sharp": "^5.0.0",
-    "gatsby-plugin-vanilla-extract": "^2.0.1",
-    "gatsby-source-contentful": "^8.0.0",
-    "gatsby-source-filesystem": "^5.0.0",
-    "gatsby-transformer-sharp": "^5.0.0",
+    "@vanilla-extract/css": "^1.9.2",
+    "@vanilla-extract/css-utils": "^0.1.3",
+    "@vanilla-extract/webpack-plugin": "^2.2.0",
+    "gatsby": "^5.2.0",
+    "gatsby-plugin-image": "^3.2.0",
+    "gatsby-plugin-sharp": "^5.2.0",
+    "gatsby-plugin-vanilla-extract": "^4.0.0",
+    "gatsby-source-filesystem": "^5.2.0",
+    "gatsby-transformer-sharp": "^5.2.0",
     "is-absolute-url": "^4.0.1",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-feather": "^2.0.9",
-    "sharp": "^0.30.5"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-feather": "^2.0.10",
+    "sharp": "^0.31.2"
   },
   "devDependencies": {
-    "prettier": "2.5.1",
-    "husky": "^7.0.4",
-    "lint-staged": "^12.3.5"
+    "prettier": "2.8.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.4"
   },
   "scripts": {
     "start": "gatsby develop",
