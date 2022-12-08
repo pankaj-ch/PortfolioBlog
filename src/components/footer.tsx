@@ -67,63 +67,76 @@ const getSocialName = ({ service }) => {
   return socialMedia[service]?.name
 }
 
-const data = {
+interface FooterData {
+  links: { id: string; href: string; text: string }[]
+  meta: { id: string; href: string; text: string }[]
+  copyright: string
+  socialLinks: { id: string; service: string; username: string }[]
+}
+
+const data: FooterData = {
   links: [
     {
-      id: 0,
+      id: "0",
       href: "#!",
       text: "Products",
     },
     {
-      id: 1,
+      id: "1",
       href: "#!",
       text: "Pricing",
     },
     {
-      id: 2,
+      id: "2",
       href: "#!",
       text: "About",
     },
     {
-      id: 3,
+      id: "3",
       href: "#!",
       text: "Blog",
     },
   ],
   meta: [
     {
-      id: 0,
+      id: "0",
       href: "/terms",
       text: "Terms",
     },
     {
-      id: 1,
+      id: "1",
       href: "/privacy",
       text: "Privacy Policy",
     },
   ],
   socialLinks: [
     {
+      id: "0",
       service: "TWITTER",
       username: "gatsbyjs",
     },
     {
+      id: "1",
       service: "INSTAGRAM",
       username: "gatsbyjs",
     },
     {
+      id: "2",
       service: "GITHUB",
       username: "gatsbyjs",
     },
     {
+      id: "3",
       service: "FACEBOOK",
       username: "gatsbyjs",
     },
     {
+      id: "4",
       service: "YOUTUBE",
       username: "gatsbyjs",
     },
     {
+      id: "5",
       service: "TWITCH",
       username: "gatsbyjs",
     },
@@ -131,7 +144,7 @@ const data = {
   copyright: "© 2022 Gatsby Inc. All rights reserved",
 }
 
-export default function Footer(props) {
+export default function Footer() {
   const { links, meta, socialLinks, copyright } = data
 
   return (
