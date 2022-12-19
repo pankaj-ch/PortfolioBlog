@@ -37,6 +37,13 @@ exports.createSchemaCustomization = async ({ actions }) => {
 
   // interfaces
   actions.createTypes(/* GraphQL */ `
+    interface Image implements Node {
+      id: ID!
+      alt: String
+      gatsbyImageData: GatsbyImageData @wpImagePassthroughResolver
+      url: String
+    }
+
     interface HomepageImage implements Node {
       id: ID!
       alt: String
@@ -49,6 +56,25 @@ exports.createSchemaCustomization = async ({ actions }) => {
     interface HomepageBlock implements Node {
       id: ID!
       blocktype: String
+    }
+
+    interface BlogAuthor implements Node {
+      id: ID!
+      name: String
+      avatar: Image @link
+    }
+
+    interface BlogPost implements Node {
+      id: ID!
+      slug: String!
+      title: String!
+      html: String!
+      excerpt: String!
+      image: HomepageImage @link
+      date: Date! @dateformat
+      seo: WpBlogPostSeo
+      author: BlogAuthor
+      category: String
     }
   `)
 
@@ -253,6 +279,34 @@ exports.createSchemaCustomization = async ({ actions }) => {
     }
   `)
 
+  // posts
+  actions.createTypes(/* GraphQL */ `
+    type WpBlogPost implements Node & BlogPost  {
+      id: ID!
+      slug: String!
+      title: String!
+      html: String!
+      excerpt: String!
+      date: Date! @dateformat
+      image: HomepageImage @link
+      author: BlogAuthor @link(by: "parent.id")
+      category: String
+    }
+
+    type WpBlogAuthor implements Node & BlogAuthor {
+      id: ID!
+      name: String
+      avatar: Image @link
+    }
+
+    type WpBlogAuthorAvatar implements Node & Image {
+      id: ID!
+      alt: String
+      url: String
+      gatsbyImageData: GatsbyImageData @wpImagePassthroughResolver
+    }
+  `)
+
   // WordPress types
   actions.createTypes(/* GraphQL */ `
     type WpMediaItem implements Node & RemoteFile & HomepageImage {
@@ -278,8 +332,7 @@ exports.onCreateNode = ({
 }) => {
   if (!node.internal.type.includes("Wp")) return
 
-  const createLinkNode =
-    (parent) =>
+  const createLinkNode = (parent) =>
     ({ url, title, ...rest }, i) => {
       const id = createNodeId(`${parent.id} >>> HomepageLink ${url} ${i}`)
       actions.createNode({
@@ -533,9 +586,51 @@ exports.onCreateNode = ({
         break
     }
   }
+
+  if (node.internal.type === "WpPost") {
+    // create custom BlogPost type
+    actions.createNode({
+      ...node,
+      id: createNodeId(`${node.id} >>> WpBlogPost`),
+      internal: {
+        type: "WpBlogPost",
+        contentDigest: node.internal.contentDigest,
+      },
+      parent: node.id,
+      html: node.content,
+      image: node.featuredImage?.node?.id,
+      author: node.author?.node?.id,
+    })
+  }
+
+  if (node.internal.type === "WpUser") {
+    // create custom BlogAuthor type
+    const avatarID = createNodeId(node.avatar.url)
+    actions.createNode({
+      id: avatarID,
+      internal: {
+        type: "WpBlogAuthorAvatar",
+        contentDigest: createContentDigest(node.avatar.url),
+      },
+      url: node.avatar.url,
+      alt: node.name,
+      gatsbyImageData: null,
+    })
+
+    actions.createNode({
+      id: createNodeId(`${node.id} >>> BlogAuthor`),
+      internal: {
+        type: "WpBlogAuthor",
+        contentDigest: node.internal.contentDigest,
+      },
+      parent: node.id,
+      name: node.name,
+      avatar: avatarID,
+    })
+  }
 }
 
-exports.createPages = ({ actions }) => {
+exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createSlice } = actions
   createSlice({
     id: "header",
@@ -545,5 +640,50 @@ exports.createPages = ({ actions }) => {
     id: "footer",
     component: require.resolve("./src/components/footer.tsx"),
   })
+
+
+  const result = await graphql(`
+    {
+      posts: allBlogPost {
+        nodes {
+          id
+          slug
+        }
+      }
+    }
+  `)
+
+  if (result.errors) {
+    reporter.panicOnBuild(
+      `[gatsby-theme-abstract-blog] There was an error sourcing blog posts`,
+      result.errors
+    )
+  }
+
+  const posts = result.data.posts.nodes
+
+  if (posts.length < 1) return
+
+  actions.createPage({
+    path: "/blog/",
+    component: require.resolve("./src/templates/blog-index.tsx"),
+    context: {},
+  })
+
+
+  posts.forEach((post, i) => {
+    const previous = posts[i - 1]?.slug
+    const next = posts[i + 1]?.slug
+
+    actions.createPage({
+      path: `/blog/${post.slug}`,
+      component: require.resolve("./src/templates/blog-post.tsx"),
+      context: {
+        id: post.id,
+        slug: post.slug,
+        previous,
+        next,
+      },
+    })
+  })
 }
-      

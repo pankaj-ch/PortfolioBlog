@@ -1,4 +1,5 @@
 import * as React from "react"
+import { graphql } from "gatsby"
 import { GatsbyImage } from "gatsby-plugin-image"
 import Layout from "../components/layout"
 import {
@@ -82,10 +83,15 @@ function PostCardSmall({
 }
 
 export interface BlogIndexProps {
-  posts: BlogPost[]
+  data: {
+    allBlogPost :{
+      nodes: BlogPost[]
+    }
+  } 
 }
 
-export default function BlogIndex({ posts }: BlogIndexProps) {
+export default function BlogIndex(props: BlogIndexProps) {
+  const posts = props.data.allBlogPost.nodes
   const featuredPosts = posts.filter((p) => p.category === "Featured")
   const regularPosts = posts.filter((p) => p.category !== "Featured")
 
@@ -119,3 +125,26 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
 export const Head = () => {
   return <SEOHead title="Blog" />
 }
+
+export const query = graphql`
+  query {
+    allBlogPost(sort: { date: DESC }) {
+      nodes {
+        id
+        slug
+        title
+        excerpt
+        category
+        image {
+          id
+          alt
+          gatsbyImageData
+        }
+        author {
+          id
+          name
+        }
+      }
+    }
+  }
+`
