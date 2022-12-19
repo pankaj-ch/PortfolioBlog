@@ -20,7 +20,7 @@ interface PostCardSmallProps {
   slug: string
   image?: HomepageImage
   title?: string
-  category?: string
+  categories?: string
 }
 
 interface PostCardProps extends PostCardSmallProps {
@@ -34,7 +34,7 @@ function PostCard({
   title,
   excerpt,
   author,
-  category,
+  categories,
   ...props
 }: PostCardProps) {
   return (
@@ -46,10 +46,12 @@ function PostCard({
         </>
       )}
       <Subhead>
-        <Kicker>{category}</Kicker>
+        <Kicker>{categories}</Kicker>
         {title}
       </Subhead>
-      <Text as="p">{excerpt}</Text>
+      <Text>
+        <p dangerouslySetInnerHTML={{ __html: excerpt }} />
+      </Text>
       {author?.name && (
         <Text variant="bold">
           <div>By {author.name}</div>
@@ -63,7 +65,7 @@ function PostCardSmall({
   slug,
   image,
   title,
-  category,
+  categories,
   ...props
 }: PostCardSmallProps) {
   return (
@@ -75,7 +77,7 @@ function PostCardSmall({
         </>
       )}
       <Subhead>
-        <Kicker>{category}</Kicker>
+        <Kicker>{categories}</Kicker>
         {title}
       </Subhead>
     </BlockLink>
@@ -84,16 +86,24 @@ function PostCardSmall({
 
 export interface BlogIndexProps {
   data: {
-    allBlogPost :{
+    allBlogPost: {
       nodes: BlogPost[]
     }
-  } 
+  }
 }
 
 export default function BlogIndex(props: BlogIndexProps) {
   const posts = props.data.allBlogPost.nodes
-  const featuredPosts = posts.filter((p) => p.category === "Featured")
-  const regularPosts = posts.filter((p) => p.category !== "Featured")
+
+  const featuredPosts = [];
+  const regularPosts = [];
+
+  for (const post of posts) {
+    const categories = post.categories?.nodes?.map((x) => x.name);
+    const isFeatured = categories.some((x) => x === "Featured");
+    const postsBucket = isFeatured ? featuredPosts : regularPosts;
+    postsBucket.push({ ...post, categories: categories.join(", ") })
+  }
 
   return (
     <Layout>
@@ -134,7 +144,12 @@ export const query = graphql`
         slug
         title
         excerpt
-        category
+        categories {
+          nodes {
+            id 
+            name
+          }
+        }
         image {
           id
           alt

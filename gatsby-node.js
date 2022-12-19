@@ -74,7 +74,7 @@ exports.createSchemaCustomization = async ({ actions }) => {
       date: Date! @dateformat
       seo: WpBlogPostSeo
       author: BlogAuthor
-      category: String
+      categories: WpPostToCategoryConnectionType
     }
   `)
 
@@ -290,7 +290,7 @@ exports.createSchemaCustomization = async ({ actions }) => {
       date: Date! @dateformat
       image: HomepageImage @link
       author: BlogAuthor @link(by: "parent.id")
-      category: String
+      categories: WpPostToCategoryConnectionType
     }
 
     type WpBlogAuthor implements Node & BlogAuthor {
@@ -598,6 +598,7 @@ exports.onCreateNode = ({
       },
       parent: node.id,
       html: node.content,
+      categories: node.categories,
       image: node.featuredImage?.node?.id,
       author: node.author?.node?.id,
     })

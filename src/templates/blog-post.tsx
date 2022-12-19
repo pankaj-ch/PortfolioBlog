@@ -22,16 +22,23 @@ export interface BlogAuthor {
   avatar: HomepageImage
 }
 
+export interface BlogCategory {
+  id: string
+  name: string
+}
+
 export interface BlogPost {
   id: string
   slug: string
   title: string
   excerpt: string
-  category: string
   date: string
   html: string
-  image: HomepageImage
   author: BlogAuthor
+  image: HomepageImage
+  categories: {
+    nodes: BlogCategory[]
+  }
 }
 
 interface BlogPostProps {
